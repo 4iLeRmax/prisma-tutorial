@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// npm i prisma -D
+// npx prisma init --datasource-provider sqlite
+// npx prisma db push
+// ??? npx prisma migrate dev --name init 
+
+// import { PrismaClient } from "@prisma/client";
+
+// const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+// export const prisma =
+//   globalForPrisma.prisma || new PrismaClient();
+
+// if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+model User {
+  id             String @id @default(uuid())
+  email          String @unique
+  hashedPassword String
+  posts          Post[]
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  title     String   @unique
+  slug      String   @unique
+  content   String
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+}
